@@ -1,1 +1,1 @@
-# ether-fund-contract 
+# ether-campaign-contract
