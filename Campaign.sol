@@ -5,6 +5,8 @@ contract Campaign{
     address public manager;
     uint public minimumContribution;
     mapping(address => bool)public approvers;
+    uint public approversCount;
+
 
     struct Request {
         string description;
@@ -18,6 +20,7 @@ contract Campaign{
 
     Request[] public requests;
 
+
     modifier restricted() {
         require(msg.sender == manager);
         _;
@@ -30,7 +33,11 @@ contract Campaign{
 
     function contribute () public payable {
         require(msg.value >= minimumContribution);
-        approvers[msg.sender] = true;
+
+        if (!approvers[msg.sender]) { //one approval vote per address
+            approvers[msg.sender] = true;
+            approversCount++;
+        }
     }
 
     function createRequest(string description, uint value, address recipient) public restricted{
@@ -53,6 +60,16 @@ contract Campaign{
 
         request.approvals[msg.sender] = true; //mark user as having voted
         request.approvalCount++; //increment total
+    }
+
+    function finalizeRequest(uint index) public payable restricted {
+        Request storage request = requests[index];
+
+        require(request.approvalCount > (approversCount / 2)); //require majority approval
+        require(!request.complete);
+
+        request.recipient.transfer(request.value);
+        request.complete = true;
     }
 
 }
