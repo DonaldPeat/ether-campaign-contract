@@ -11,26 +11,26 @@ contract CampaignFactory {
     function getDeployedCampaigns() public view returns(address[]){
         return deployedCampaigns;
     }
-
 }
 
 contract Campaign{
 
     uint public minimumContribution;
-    address public manager;
+    uint public approversCount;
     uint public approvalThreshold;
     string public campaignTitle;
     string public campaignDescription;
+    address public manager;
     mapping(address => bool)public approvers;
-    uint public approversCount;
 
 
     struct Request {
-        string description;
-        uint value;
-        address recipient;
+
         bool complete;
         uint approvalCount;
+        uint value;
+        string description;
+        address recipient;
         mapping(address => bool) approvals;
     }
 
